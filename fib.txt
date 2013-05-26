@@ -1,0 +1,101 @@
+( Compute the first n Fibonacci numbers and store them
+  at the beginning of the global array.
+  n -- )
+sub fib
+  $n save
+  1 0 ref save
+  $n load 0 = branch fibdone
+  1 1 ref save
+  1 $i save
+:fibloop
+  $i load                    ($i)
+  $n load                    ($i $n)
+  = branch fibdone
+  $i load                    ($i)
+  dup dup                    ($i $i $i)
+  1 + dup $i save ref        ($i $i [$i+1])
+  rot                        ([$i+1] $i $i)
+  1 - ref load               ([$i+1] $i $[$i-1])
+  swap ref load              ([$i+1] $[$i-1] $[$i])
+  + swap save
+  jump fibloop
+:fibdone
+end
+
+( Reads a number from stdin
+  -- n )
+sub numread
+:skipspaces
+  read
+  dup ' ' != branch skipped
+  drop
+  jump skipspaces
+:skipped
+  " " swap 0 swap putchar
+:numloop
+  read
+  dup '0' < swap
+  dup '9' > swap rot
+  or branch numend
+  " " swap 0 swap putchar
+  concat
+  jump numloop
+:numend
+  drop
+  toint
+end
+
+( Writes a number to stdout
+  n -- )
+sub numwrite
+  tostring
+  strwrite
+end
+
+( Duplicate the two elements on the top of the stack
+  x y -- x y x y )
+sub dup2
+  swap   (y x)
+  dup    (y x x)
+  rot    (x y x)
+  swap   (x x y)
+  dup    (x x y y)
+  rot    (x y x y)
+end
+
+( Writes a string to stdout
+  str -- )
+sub strwrite
+  dup length 0        (str len 0)
+:strwloop
+  dup2                (str len i len i)
+  = branch strwdone   (str len i)
+  rot rot             (len i str)
+  dup2                (len i str i str)
+  swap                (len i str str i)
+  getchar             (len i str [str[i]])
+  write               (len i str)
+  rot                 (str len i)
+  1 +                 (str len [i+1])
+  jump strwloop
+:strwdone
+  drop drop drop
+end
+
+"Enter a non-negative number: " strwrite
+numread         (n)
+dup             (n n)
+fib             (n)
+0               (n 0)
+:printloop
+dup dup         (n i i i)
+ref load        (n i i Fib_i)
+swap tostring   (n i Fib_i str[i])
+"Fib[" swap concat "] = " concat swap tostring concat '\n' write strwrite (n i)
+dup2            (n i n i)
+= branch done    (n i)
+1 +
+jump printloop
+:done
+drop drop
+'\n' write

@@ -1,0 +1,84 @@
+(a b -- a b a b)
+sub dup2
+  swap (b a)
+  dup  (b a a)
+  rot  (a b a)
+  swap (a a b)
+  dup  (a a b b)
+  rot  (a b a b)
+end
+
+( Reads a number from stdin
+  -- n )
+sub numread
+:skipspaces
+  read
+  dup ' ' != branch skipped
+  drop
+  jump skipspaces
+:skipped
+  " " swap 0 swap putchar
+:numloop
+  read
+  dup '0' < swap
+  dup '9' > swap rot
+  or branch numend
+  " " swap 0 swap putchar
+  concat
+  jump numloop
+:numend
+  drop
+  toint
+end
+
+( Writes a number to stdout
+  n -- )
+sub numwrite
+  tostring
+  strwrite
+end
+
+( Writes a string to stdout
+  str -- )
+sub strwrite
+  dup length 0        (str len 0)
+:strwloop
+  dup2                (str len i len i)
+  = branch strwdone   (str len i)
+  rot rot             (len i str)
+  dup2                (len i str i str)
+  swap                (len i str str i)
+  getchar             (len i str [str[i]])
+  write               (len i str)
+  rot                 (str len i)
+  1 +                 (str len [i+1])
+  jump strwloop
+:strwdone
+  drop drop drop
+end
+
+(a b -- gcd[a, b] gcd[a, b])
+sub gcd_helper
+  dup2              (a b a b)
+  = branch gcddone  (a b)
+  dup2              (a b a b)
+  >= branch a_ge_b  (a b)
+  swap              (max[a, b] min[a, b])
+:a_ge_b
+  dup               (max[a, b] min[a, b] min[a, b])
+  rot               (min[a, b] max[a, b] min[a, b])
+  -                 (min[a, b] [max[a, b] - min[a, b]])
+  gcd_helper
+:gcddone
+end
+
+(a b -- gcd[a, b])
+sub gcd
+  gcd_helper drop
+end
+
+"Enter a: " strwrite numread (a)
+"Enter b: " strwrite numread (a b)
+gcd
+"GCD(a, b) = " strwrite numwrite
+'\n' write
