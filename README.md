@@ -1,7 +1,7 @@
 Programming-Language-Analyzer
 =============================
 
-This program takes a "fake" programming language, parses it, checks the syntaxes, and derives semantic meaning from each command. This program works with two programs, one that finds the GCD of two numbers and the other the Fibonacci number of a point in the sequence.
+This program takes a "fake" programming language, parses it, checks the syntax, and checks the semantic rules from each command. This program works with two programs, one that finds the GCD of two numbers and the other the Fibonacci number of a point in the sequence.
 
 ---README for Java FL Scanner and Parser and Semantic Analyzer---
 
